@@ -8,7 +8,7 @@ import 'package:flutter_note_app/presentation/notes/notes_state.dart';
 class NotesViewModel with ChangeNotifier {
   final UseCases useCases;
 
-  NotesState _state = NotesState();
+  NotesState _state = const NotesState();
 
   NotesState get state => _state;
 
@@ -30,6 +30,12 @@ class NotesViewModel with ChangeNotifier {
           noteOrder: noteOrder,
         );
         _loadNotes();
+      },
+      toggleOrderSection: () {
+        _state = state.copyWith(
+          isOrderSectionVisible: !state.isOrderSectionVisible,
+        );
+        notifyListeners();
       },
     );
   }
