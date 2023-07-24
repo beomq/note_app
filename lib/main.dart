@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_note_app/di/provider_setup.dart';
-import 'package:flutter_note_app/presentation/notes/notes_screen.dart';
+import 'package:flutter_note_app/di/di_setup.dart';
+import 'package:flutter_note_app/router.dart';
 import 'package:flutter_note_app/ui/colors.dart';
-import 'package:provider/provider.dart';
 
 void main() async {
   // 플랫폼 채널의 위젯 바인딩을 보장
   WidgetsFlutterBinding.ensureInitialized();
+  await configureDependencies();
 
-  final providers = await getProviders();
   runApp(
-    MultiProvider(
-      providers: providers,
-      child: const MyApp(),
-    ),
+    const MyApp(),
   );
 }
 
@@ -22,7 +18,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       title: 'Flutter Demo',
       theme: ThemeData(
         unselectedWidgetColor: Colors.white,
@@ -40,7 +37,6 @@ class MyApp extends StatelessWidget {
               bodyColor: Colors.white,
             ),
       ),
-      home: const NoteScreen(),
     );
   }
 }

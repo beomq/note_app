@@ -1,15 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_note_app/domain/repository/note_repository.dart';
-import 'package:flutter_note_app/presentation/add_edit_note/add_edit_note_screen.dart';
-import 'package:flutter_note_app/presentation/add_edit_note/add_edit_note_view_model.dart';
 import 'package:flutter_note_app/presentation/notes/notes_event.dart';
 import 'package:flutter_note_app/presentation/notes/notes_view_model.dart';
 import 'package:flutter_note_app/presentation/notes/widgets/note_item.dart';
 import 'package:flutter_note_app/presentation/notes/widgets/order_section.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class NoteScreen extends StatelessWidget {
-  const NoteScreen({Key? key}) : super(key: key);
+class NotesScreen extends StatelessWidget {
+  const NotesScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +34,7 @@ class NoteScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          bool? isSaved = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) {
-              final repository = context.read<NoteRepository>();
-              final viewModel = AddEditNoteViewModel(repository);
-              return ChangeNotifierProvider(
-                create: (_) => viewModel,
-                child: const AddEditNoteScreen(),
-              );
-            }),
-          );
+          bool? isSaved = await context.push('/add_note');
 
           if (isSaved != null && isSaved) {
             viewModel.onEvent(const NotesEvent.loadNotes());
@@ -69,19 +59,11 @@ class NoteScreen extends StatelessWidget {
           ...state.notes
               .map((note) => GestureDetector(
                     onTap: () async {
-                      bool? isSaved = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            final repository = context.read<NoteRepository>();
-                            final viewModel = AddEditNoteViewModel(repository);
-                            return ChangeNotifierProvider(
-                              create: (_) => viewModel,
-                              child: AddEditNoteScreen(note: note),
-                            );
-                          },
-                        ),
+                      final uri = Uri(
+                        path: '/edit_note',
+                        queryParameters: {'note': jsonEncode(note.toJson())},
                       );
+                      bool? isSaved = await context.push(uri.toString());
                       if (isSaved != null && isSaved) {
                         viewModel.onEvent(const NotesEvent.loadNotes());
                       }
